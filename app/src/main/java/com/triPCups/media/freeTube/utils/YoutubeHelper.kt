@@ -12,5 +12,12 @@ class YoutubeHelper {
             return matchResult?.groupValues?.getOrNull(1)
         }
 
+        // Extracts timestamp from YouTube URL
+        fun extractTimestampFromUrl(url: String): Int? {
+            val regex = "([?&]t=|[?&]start=)(\\d+)"
+            val pattern = Regex(regex)
+            val matchResult = pattern.find(url)
+            return matchResult?.groupValues?.getOrNull(2)?.toIntOrNull()
+        }
     }
 }

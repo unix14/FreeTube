@@ -1,5 +1,6 @@
 package com.triPCups.media.freeTube
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -10,12 +11,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.triPCups.media.freeTube.consts.Constants
+import com.triPCups.media.freeTube.consts.Constants.Companion.BASE_UTUBE_URL
 import com.triPCups.media.freeTube.databinding.ActivityMainBinding
 import com.triPCups.media.freeTube.utils.YoutubeHelper
 import com.triPCups.media.freeTube.views.video.VideoFragment
 import com.triPCups.media.freeTube.views.webview.WebViewFragment
+import com.triPCups.media.freeTube.views.webview.WebViewFragmentListener
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), WebViewFragmentListener {
 
     private lateinit var binding: ActivityMainBinding
     private var sharedVideoId: String? = null
@@ -41,13 +44,15 @@ class MainActivity : AppCompatActivity() {
         window.navigationBarColor = blackColor
         window.statusBarColor = blackColor
 
-        loadWebViewFragment("https://www.youtube.com/results?search_query=qqq")
-//        loadVideoFragment(sharedVideoId?.let {
-//            YoutubeHelper.extractVideoIdFromUrl(sharedVideoId!!)
-//            //todo extract time to skip to point
-//        } ?: run {
-//            Constants.DEFAULT_VIDEO_ID
-//        })
+        sharedVideoId?.let {
+            val second = YoutubeHelper.extractTimestampFromUrl(it) ?: -1
+            Log.d("wow", "initUi: second is $second")
+
+            loadVideoFragment(YoutubeHelper.extractVideoIdFromUrl(sharedVideoId ?: Constants.DEFAULT_VIDEO_ID) ?: Constants.DEFAULT_VIDEO_ID)
+            //todo extract time to skip to point
+        } ?: run {
+            loadWebViewFragment(BASE_UTUBE_URL)
+        }
     }
 
     private fun handleShareData() = with(intent) {
@@ -81,7 +86,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadFragment(fragment: Fragment) = with(supportFragmentManager) {
         beginTransaction()
-            .add(binding.container.id, fragment)
+            .replace(binding.container.id, fragment)
+            .addToBackStack(null) // Add to back stack to handle back navigation
             .commit()
+    }
+
+    override fun onVideoClicked(videoId: String) {
+        loadVideoFragment(videoId)
     }
 }

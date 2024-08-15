@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
@@ -15,6 +16,7 @@ import com.triPCups.media.freeTube.consts.Constants
 import com.triPCups.media.freeTube.databinding.FragmentVideoBinding
 import com.triPCups.media.freeTube.utils.TAG
 import com.triPCups.media.freeTube.utils.WatchlistAgent
+import com.triPCups.media.freeTube.utils.urlToLoad
 import kotlin.jvm.functions.Function0
 
 
@@ -73,6 +75,13 @@ class VideoFragment : Fragment() {
                 viewModel.setCurrentVideo(videoId)
             }
         }
+        // Handle back press to navigate to WebViewFragment
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                parentFragmentManager.popBackStack()
+                urlToLoad = ""
+            }
+        })
         return binding.root
     }
 
