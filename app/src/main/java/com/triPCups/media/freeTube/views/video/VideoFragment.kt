@@ -174,3 +174,8 @@ class VideoFragment : Fragment() {
         _binding = null
     }
 }
+
+
+//TODO:: fix rotation issues- use Fullscreen feature from player library?
+//TODO:: Zoom in and out on the video
+//TODO:: make screen transfer into full screen
