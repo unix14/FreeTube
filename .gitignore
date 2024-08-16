@@ -25,3 +25,4 @@ replay_pid*
 *.lock
 *.bin
 *.lock
+/.gradle

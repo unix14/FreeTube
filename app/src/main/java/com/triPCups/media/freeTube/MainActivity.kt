@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
             insets
         }
 
-        handleShareData()
+        handleNewIntent()
         initUi()
     }
 
@@ -55,7 +55,12 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
         }
     }
 
-    private fun handleShareData() = with(intent) {
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        handleNewIntent()
+    }
+    private fun handleNewIntent() = with(intent) {
         when {
             action == Intent.ACTION_SEND -> {
                 if ("text/plain" == type) {
