@@ -1,9 +1,11 @@
 package com.triPCups.media.freeTube
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.OrientationEventListener
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -21,6 +23,7 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
 
     private lateinit var binding: ActivityMainBinding
     private var sharedVideoUrl: String? = null
+    private var orientationEventListener: OrientationEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +39,56 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
 
         handleNewIntent()
         initUi()
+
+        // Initialize the OrientationEventListener
+        orientationEventListener = object : OrientationEventListener(this) {
+            override fun onOrientationChanged(orientation: Int) {
+                if (orientation == ORIENTATION_UNKNOWN) {
+                    // The device is in an unknown orientation state
+                    return
+                }
+
+                // Determine the rotation angle (0, 90, 180, 270 degrees)
+                when (orientation) {
+                    in 45..134 -> {
+                        // Device is rotated to landscape (clockwise)
+                        Log.d("Orientation", "Landscape 90°")
+                        // Force landscape orientation
+                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+                    }
+
+                    in 135..224 -> {
+                        // Device is rotated upside down
+                        Log.d("Orientation", "Upside Down 180°")
+                        // Force portrait orientation if you want to revert to portrait when upside down
+                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
+                    }
+
+                    in 225..314 -> {
+                        // Device is rotated to landscape (counterclockwise)
+                        Log.d("Orientation", "Landscape 270°")
+                        // Force landscape orientation
+                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    }
+
+                    else -> {
+                        // Device is in portrait
+                        Log.d("Orientation", "Portrait 0°")
+                        // Force portrait orientation
+                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    }
+                }
+            }
+        }
+        // Enable the OrientationEventListener
+        orientationEventListener?.enable()
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Disable the OrientationEventListener when the activity is destroyed
+        orientationEventListener?.disable()
     }
 
     private fun initUi() {

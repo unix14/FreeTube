@@ -1,5 +1,6 @@
 package com.triPCups.media.freeTube.views.video
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -59,10 +60,25 @@ class VideoFragment : Fragment() {
         addYouTubePlayerListener(youTubePlayerListener!!)
         addFullscreenListener(object : FullscreenListener {
             override fun onEnterFullscreen(fullscreenView: View, exitFullscreen: () -> Unit) {
-
+                Log.d("wow", "Fullscreen: onEnterFullscreen")
             }
-            override fun onExitFullscreen() {}
+            override fun onExitFullscreen() {
+                Log.d("wow", "Fullscreen: onExitFullscreen")
+            }
         })
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        Log.d("wow", "onConfigurationChanged")
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // Handle the change to landscape
+            Log.d("wow", "onConfigurationChanged: ORIENTATION_LANDSCAPE")
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            // Handle the change to portrait
+            Log.d("wow", "onConfigurationChanged: ORIENTATION_PORTRAIT")
+        }
     }
 
     override fun onCreateView(
@@ -175,7 +191,4 @@ class VideoFragment : Fragment() {
     }
 }
 
-
-//TODO:: fix rotation issues- use Fullscreen feature from player library?
 //TODO:: Zoom in and out on the video
-//TODO:: make screen transfer into full screen
