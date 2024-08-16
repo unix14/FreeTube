@@ -7,11 +7,16 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.OnBackPressedCallback
 import com.triPCups.media.freeTube.consts.Constants
 import com.triPCups.media.freeTube.databinding.FragmentWebViewBinding
 import com.triPCups.media.freeTube.utils.WebAppInterface
@@ -19,6 +24,7 @@ import com.triPCups.media.freeTube.utils.WebAppInterface
 
 interface WebViewFragmentListener {
     fun onVideoClicked(videoId: String)
+    fun loadHome()
 }
 
 class WebViewFragment : Fragment() {
@@ -63,7 +69,9 @@ class WebViewFragment : Fragment() {
                 loadWithOverviewMode = true
                 useWideViewPort = true
                 mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                webView.settings.mediaPlaybackRequiresUserGesture = true // This may prevent autoplay
             }
+            webView.webChromeClient = WebChromeClient()
             webView.addJavascriptInterface(WebAppInterface(listener!!), "AndroidInterface")
             webViewClient = object : WebViewClient() {
 
@@ -120,6 +128,21 @@ class WebViewFragment : Fragment() {
         if(context is WebViewFragmentListener) {
             listener = context as WebViewFragmentListener
         }
+        // Handle back press to navigate to WebViewFragment
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                binding.webView.apply {
+                    if(canGoBack()) {
+                        Log.d("wow", "handleOnBackPressed: canGoBack")
+                        listener?.loadHome()
+                        goBack()
+                    } else {
+                        Log.d("wow", "handleOnBackPressed: finish")
+                        requireActivity().finish()
+                    }
+                }
+            }
+        })
         return binding.root
     }
 

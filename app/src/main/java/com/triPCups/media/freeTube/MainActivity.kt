@@ -1,6 +1,5 @@
 package com.triPCups.media.freeTube
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -21,7 +20,7 @@ import com.triPCups.media.freeTube.views.webview.WebViewFragmentListener
 class MainActivity : AppCompatActivity(), WebViewFragmentListener {
 
     private lateinit var binding: ActivityMainBinding
-    private var sharedVideoId: String? = null
+    private var sharedVideoUrl: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,29 +39,30 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
     }
 
     private fun initUi() {
+        // todo fix nav color is not changed in some devices
         val blackColor = Color.rgb(0, 0, 0)
         window.navigationBarColor = blackColor
         window.statusBarColor = blackColor
 
-        sharedVideoId?.let {
+        loadHome()
+
+        sharedVideoUrl?.let {
             val second = YoutubeHelper.extractTimestampFromUrl(it) ?: -1
             Log.d("wow", "initUi: second is $second")
 
-            loadVideoFragment(YoutubeHelper.extractVideoIdFromUrl(sharedVideoId ?: Constants.DEFAULT_VIDEO_ID) ?: Constants.DEFAULT_VIDEO_ID)
+            loadVideoFragment(YoutubeHelper.extractVideoIdFromUrl(sharedVideoUrl ?: "") ?: Constants.DEFAULT_VIDEO_ID)
             //todo extract time to skip to point
-        } ?: run {
-            loadWebViewFragment(BASE_UTUBE_URL)
         }
     }
 
     private fun handleShareData() = with(intent) {
         when {
             action == Intent.ACTION_SEND -> {
-                if ("text/plain" == intent.type) {
+                if ("text/plain" == type) {
                     // Handle text being sent
                     getStringExtra(Intent.EXTRA_TEXT)?.let {
                         // Update UI to reflect text being shared
-                        sharedVideoId = it
+                        sharedVideoUrl = it
                     }
                 } else {
                     // print an error
@@ -72,6 +72,16 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
             else -> {
                 // Handle other intents, such as being started from the home screen
                 Log.e("wow", "handleShareText: couldn't recognise the intent.type is $type and action is $action")
+
+                // Handle intent from other apps starting a youtube video
+                data?.let {
+                    // Handle the URL here
+                    val url = data.toString()
+                    // Perform action based on the URL, like loading a specific fragment or activity
+                    if(url.contains("youtube.com") || url.contains("youtu.be")) {
+                        sharedVideoUrl = url
+                    }
+                }
             }
         }
     }
@@ -81,7 +91,7 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
     }
 
     private fun loadWebViewFragment(url: String) {
-        loadFragment(WebViewFragment.newInstance(url))
+        addFragment(WebViewFragment.newInstance(url))
     }
 
     private fun loadFragment(fragment: Fragment) = with(supportFragmentManager) {
@@ -89,6 +99,16 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
             .replace(binding.container.id, fragment)
             .addToBackStack(null) // Add to back stack to handle back navigation
             .commit()
+    }
+
+    private fun addFragment(fragment: Fragment) = with(supportFragmentManager) {
+        beginTransaction()
+            .add(binding.container.id, fragment)
+            .commit()
+    }
+
+    override fun loadHome() {
+        loadWebViewFragment(BASE_UTUBE_URL)
     }
 
     override fun onVideoClicked(videoId: String) {
