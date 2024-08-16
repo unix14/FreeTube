@@ -192,3 +192,4 @@ class VideoFragment : Fragment() {
 }
 
 //TODO:: Zoom in and out on the video
+//TODO:: implement leanback
