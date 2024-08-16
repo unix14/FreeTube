@@ -14,4 +14,8 @@ class WebViewViewModel : ViewModel() {
     fun loadUrl(url: String) {
         _currentUrl.postValue(url)
     }
+
+    fun clearWebpage() {
+        _currentUrl.postValue("")
+    }
 }

@@ -6,7 +6,7 @@ import com.triPCups.media.freeTube.views.webview.WebViewFragmentListener
 
 var urlToLoad = ""
 
-class WebAppInterface(private val listener: WebViewFragmentListener) {
+class WebAppInterface(private val listener: WebViewFragmentListener, private val onVideoClicked: () -> Unit ) {
 
     @JavascriptInterface
     fun onVideoClicked(videoUrl: String) {
@@ -25,6 +25,7 @@ class WebAppInterface(private val listener: WebViewFragmentListener) {
 
             Log.d("wow", "onVideoClicked: second is $second")
             listener.onVideoClicked(it)
+            onVideoClicked()
         }
     }
 }

@@ -72,7 +72,9 @@ class WebViewFragment : Fragment() {
                 webView.settings.mediaPlaybackRequiresUserGesture = true // This may prevent autoplay
             }
             webView.webChromeClient = WebChromeClient()
-            webView.addJavascriptInterface(WebAppInterface(listener!!), "AndroidInterface")
+            webView.addJavascriptInterface(WebAppInterface(listener!!) {
+                viewModel.clearWebpage()
+            }, "AndroidInterface")
             webViewClient = object : WebViewClient() {
 
                 override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
@@ -85,6 +87,22 @@ class WebViewFragment : Fragment() {
                     Log.d("wow", "onPageFinished: url is $url")
 
                     injectJavaScript()
+                }
+
+                override fun shouldInterceptRequest(
+                    view: WebView?,
+                    request: WebResourceRequest?
+                ): WebResourceResponse? {
+                    Log.d("wow", "shouldInterceptRequest: url is ${request?.url}")
+                    if (request != null
+                        /*&& request.url.toString().contains("googlevideo.com") && request.url.toString().contains("/videoplayback") &&*/
+                        && (viewModel.currentUrlData.value?.toString()?.equals(Constants.BASE_UTUBE_URL) != true
+                                && (request.url.toString().contains("youtube.com/youtubei/v1/player") || request.url.toString().contains("youtube.com/youtubei/v1/next") || request.url.toString().contains("youtube.com/watch")))
+                        ) {
+                        // Return an empty response to block the video from loading
+                        return WebResourceResponse("text/plain", "UTF-8", null)
+                    }
+                    return super.shouldInterceptRequest(view, request)
                 }
             }
         }
