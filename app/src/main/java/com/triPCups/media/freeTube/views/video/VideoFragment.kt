@@ -47,7 +47,7 @@ class VideoFragment : Fragment() {
 
     //video params - todo - move them to vm ???
     private var currentState: PlayerConstants.PlayerState = PlayerConstants.PlayerState.UNKNOWN
-    private var currentSecond: Float = 0f
+    private var currentSecond: Double = 0.0
     private var currentVideoId: String = ""
 
 
@@ -100,7 +100,7 @@ class VideoFragment : Fragment() {
 
                 override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
                     super.onCurrentSecond(youTubePlayer, second)
-                    currentSecond = second
+                    currentSecond = second.toDouble()
 
                 }
 
@@ -123,7 +123,7 @@ class VideoFragment : Fragment() {
 
                         if(::videoPlayer.isInitialized && didStartedToPlay) {
                             Log.d(TAG, "onCurrentSecond: aaa  check41 $currentSecond ${currentSecond::class.java.simpleName}")
-                            WatchlistAgent.getInstance(requireContext()).updateWatchSecondInVideo(currentVideoId, currentSecond.toFloat())
+                            WatchlistAgent.getInstance(requireContext()).updateWatchSecondInVideo(currentVideoId, currentSecond)
                         }
                     }
                 }
@@ -149,14 +149,14 @@ class VideoFragment : Fragment() {
             currentVideoId = videoId
             currentSecond = try {
                 WatchlistAgent.getInstance(requireContext())
-                    .getCurrentSecondForVideo(currentVideoId) ?: 0f
+                    .getCurrentSecondForVideo(currentVideoId) ?: 0.0
             } catch (e: Exception) {
                 e.printStackTrace()
-                -1f
+                -1.0
             }
             Log.d(TAG, "playVideo: aaa currentSecond $currentSecond")
 
-            videoPlayer.loadVideo(videoId, currentSecond)
+            videoPlayer.loadVideo(videoId, currentSecond.toFloat())
             didStartedToPlay = true
             Log.d(TAG, "playVideo: play video $currentVideoId to second : $currentSecond")
 

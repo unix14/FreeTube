@@ -55,7 +55,6 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
         }
     }
 
-
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         handleNewIntent()
@@ -85,6 +84,8 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
                     // Perform action based on the URL, like loading a specific fragment or activity
                     if(url.contains("youtube.com") || url.contains("youtu.be")) {
                         sharedVideoUrl = url
+                    } else {
+                        loadWebViewFragment(url)
                     }
                 }
             }
@@ -96,19 +97,13 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
     }
 
     private fun loadWebViewFragment(url: String) {
-        addFragment(WebViewFragment.newInstance(url))
+        loadFragment(WebViewFragment.newInstance(url))
     }
 
     private fun loadFragment(fragment: Fragment) = with(supportFragmentManager) {
         beginTransaction()
             .replace(binding.container.id, fragment)
             .addToBackStack(null) // Add to back stack to handle back navigation
-            .commit()
-    }
-
-    private fun addFragment(fragment: Fragment) = with(supportFragmentManager) {
-        beginTransaction()
-            .add(binding.container.id, fragment)
             .commit()
     }
 

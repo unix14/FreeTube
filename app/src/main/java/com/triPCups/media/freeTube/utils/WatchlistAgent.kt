@@ -31,17 +31,17 @@ class WatchlistAgent private constructor(private val context: Context) {
     }
 
     // Function to save a map of watched videos and their latest watch points
-    fun saveWatchedVideos(watchedVideos: Map<String, Float>) {
-        SharedPrefsManager.saveValue<Map<String, Float>>(KEY_WATCHED_VIDEOS, watchedVideos)
+    fun saveWatchedVideos(watchedVideos: Map<String, Double>) {
+        SharedPrefsManager.saveValue<Map<String, Double>>(KEY_WATCHED_VIDEOS, watchedVideos)
     }
 
     // Function to load the map of watched videos and their latest watch points
-    fun loadWatchedVideos(): Map<String, Float> {
-        return SharedPrefsManager.loadValue<Map<String, Float>>(KEY_WATCHED_VIDEOS, emptyMap<String, Float>()) as MutableMap<String, Float>
+    fun loadWatchedVideos(): Map<String, Double> {
+        return SharedPrefsManager.loadValue<Map<String, Double>>(KEY_WATCHED_VIDEOS, emptyMap<String, Double>()) as MutableMap<String, Double>
     }
 
     // Function to add or update a single video's watch point
-    fun add(videoId: String, watchPoint: Float) {
+    fun add(videoId: String, watchPoint: Double) {
         val watchedVideos = loadWatchedVideos().toMutableMap()
         watchedVideos[videoId] = watchPoint
         saveWatchedVideos(watchedVideos)
@@ -55,19 +55,19 @@ class WatchlistAgent private constructor(private val context: Context) {
     }
 
     // Function to update the watched videos map with new entries
-    fun updateWatchSecondInVideo(videoId: String, second: Float) {
+    fun updateWatchSecondInVideo(videoId: String, second: Double) {
 //        Log.d(TAG, "onCurrentSecond: got in2 $second")
         Log.d(TAG, "onCurrentSecond: aaa videoId check2 $second ${second::class.java.simpleName}")
 
-        SharedPrefsManager.updateMap<String, Float>(KEY_WATCHED_VIDEOS, videoId, second)
+        SharedPrefsManager.updateMap<String, Double>(KEY_WATCHED_VIDEOS, videoId, second)
     }
 
     // Function to get the current watch point for a specific video
     @Suppress("UNCHECKED_CAST")
-    fun getCurrentSecondForVideo(videoId: String): Float? {
+    fun getCurrentSecondForVideo(videoId: String): Double? {
 
-        val watchedVideos: Map<String, Float> = SharedPrefsManager.loadValue(KEY_WATCHED_VIDEOS, emptyMap<String, Float>()) as Map<String, Float>
-        return watchedVideos[videoId]?.toFloat() // Ensure Float type
+        val watchedVideos: Map<String, Double> = SharedPrefsManager.loadValue(KEY_WATCHED_VIDEOS, emptyMap<String, Double>()) as Map<String, Double>
+        return watchedVideos[videoId]?.toDouble() // Ensure Double type
 
 //        return ;
 //        Log.d(TAG, "getCurrentSecondForVideo: aaa trying to think.")
