@@ -1,5 +1,6 @@
 # FreeTube
 Free lightweight ad free YouTube player for mobile and TV.
+
 ![FreeTube Logo](images/logo.png)
 
 ## Overview
