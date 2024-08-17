@@ -1,8 +1,8 @@
 # FreeTube
+Free lightweight ad free YouTube player for mobile and TV.
 ![FreeTube Logo](images/logo.png)
 
 ## Overview
-Free lightweight ad free YouTube player for mobile and TV.
 FreeTube is an innovative Android application designed to give users a more streamlined, customizable experience with YouTube. With FreeTube, you can watch videos without distractions, manage autoplay settings, and enjoy a cleaner interface.
 
 ## Features
