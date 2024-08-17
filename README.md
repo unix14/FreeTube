@@ -36,6 +36,10 @@ Previous versions of the APK are available in the archive folder. You can downlo
     - Ensure that **youtube.com** and **www.youtube.com** are selected as supported links.
     - This will allow FreeTube to open YouTube links by default, giving you a seamless experience.
 
+## Usage Tips
+
+- For a better and more personalized experience, it's recommended to log in with your own Google account. This will allow you to access your subscriptions, watch history, and get personalized recommendations.
+
 ## License
 FreeTube is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. You may not use this work for commercial purposes, and you may not distribute modified versions of it. See [Creative Commons BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/) for more details.
 
