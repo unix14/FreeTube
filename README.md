@@ -36,7 +36,7 @@ Previous versions of the APK are available in the archive folder. You can downlo
     - This will allow FreeTube to open YouTube links by default, giving you a seamless experience.
 
 ## License
-This project is licensed under the MIT License.
+FreeTube is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. You may not use this work for commercial purposes, and you may not distribute modified versions of it. See [Creative Commons BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/) for more details.
 
 ---
 
