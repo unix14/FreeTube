@@ -45,11 +45,29 @@
                     android:scheme="https"
                     android:host="www.youtube.com" />
                 <data
+                    android:scheme="https"
+                    android:host="www.youtu.be" />
+                <data
+                    android:scheme="https"
+                    android:host="youtu.be" />
+                <data
+                    android:scheme="https"
+                    android:host="m.youtube.com" />
+                <data
                     android:scheme="http"
                     android:host="youtube.com" />
                 <data
                     android:scheme="http"
                     android:host="www.youtube.com" />
+                <data
+                    android:scheme="http"
+                    android:host="www.youtu.be" />
+                <data
+                    android:scheme="http"
+                    android:host="youtu.be" />
+                <data
+                    android:scheme="http"
+                    android:host="m.youtube.com" />
             </intent-filter>
 
         </activity>
