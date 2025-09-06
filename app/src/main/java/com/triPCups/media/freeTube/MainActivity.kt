@@ -99,11 +99,14 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
 
         loadHome()
 
-        sharedVideoUrl?.let {
-            val second = YoutubeHelper.extractTimestampFromUrl(it) ?: -1
+        if(sharedVideoUrl?.isNotEmpty() == true) {
+            var url: String = sharedVideoUrl!!
+            val second = YoutubeHelper.extractTimestampFromUrl(url) ?: -1
             Log.d("wow", "initUi: second is $second")
 
-            loadVideoFragment(YoutubeHelper.extractVideoIdFromUrl(sharedVideoUrl ?: "") ?: Constants.DEFAULT_VIDEO_ID)
+            YoutubeHelper.extractVideoIdFromUrl(url)?.let {
+                loadVideoFragment(it)
+            }
             //todo extract time to skip to point
         }
     }
@@ -137,6 +140,7 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
                     // Perform action based on the URL, like loading a specific fragment or activity
                     if(url.contains("youtube.com") || url.contains("youtu.be")) {
                         sharedVideoUrl = url
+                        initUi()
                     } else {
                         loadWebViewFragment(url)
                     }
