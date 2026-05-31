@@ -183,10 +183,17 @@ class VideoFragment : Fragment() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        if (::videoPlayer.isInitialized && didStartedToPlay) {
+            WatchlistAgent.getInstance(requireContext()).updateWatchSecondInVideo(currentVideoId, currentSecond)
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
-        binding.youTubePlayerView.release()
         youTubePlayerListener?.let { binding.youTubePlayerView.removeYouTubePlayerListener(it) }
+        binding.youTubePlayerView.release()
         _binding = null
     }
 }

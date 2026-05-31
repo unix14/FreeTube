@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
                     // Perform action based on the URL, like loading a specific fragment or activity
                     if(url.contains("youtube.com") || url.contains("youtu.be")) {
                         sharedVideoUrl = url
-                        initUi()
+                        YoutubeHelper.extractVideoIdFromUrl(url)?.let { loadVideoFragment(it) }
                     } else {
                         loadWebViewFragment(url)
                     }
@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
         loadWebViewFragment(BASE_UTUBE_URL)
     }
 
-    override fun onVideoClicked(videoId: String) {
+    override fun onVideoClicked(videoId: String, startSecond: Int) {
         loadVideoFragment(videoId)
     }
 }

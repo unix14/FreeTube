@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import com.triPCups.media.freeTube.data.SharedPrefsManager
-import kotlin.math.roundToInt
-import kotlin.math.roundToLong
 
 
 class WatchlistAgent private constructor(private val context: Context) {
@@ -37,7 +35,8 @@ class WatchlistAgent private constructor(private val context: Context) {
 
     // Function to load the map of watched videos and their latest watch points
     fun loadWatchedVideos(): Map<String, Double> {
-        return SharedPrefsManager.loadValue<Map<String, Double>>(KEY_WATCHED_VIDEOS, emptyMap<String, Double>()) as MutableMap<String, Double>
+        @Suppress("UNCHECKED_CAST")
+        return (SharedPrefsManager.loadValue<Map<String, Double>>(KEY_WATCHED_VIDEOS, emptyMap<String, Double>()) as? Map<String, Double>) ?: emptyMap()
     }
 
     // Function to add or update a single video's watch point
@@ -63,25 +62,8 @@ class WatchlistAgent private constructor(private val context: Context) {
     }
 
     // Function to get the current watch point for a specific video
-    @Suppress("UNCHECKED_CAST")
     fun getCurrentSecondForVideo(videoId: String): Double? {
-
-        val watchedVideos: Map<String, Double> = SharedPrefsManager.loadValue(KEY_WATCHED_VIDEOS, emptyMap<String, Double>()) as Map<String, Double>
-        return watchedVideos[videoId]?.toDouble() // Ensure Double type
-
-//        return ;
-//        Log.d(TAG, "getCurrentSecondForVideo: aaa trying to think.")
-//
-//        val watchedVideos: Map<String, Float> = loadWatchedVideos()
-//
-//        Log.d(TAG, "getCurrentSecondForVideo: aaa second is ${watchedVideos[videoId]} video id $videoId watchedVideos : ${watchedVideos.values.size}")
-////        if((watchedVideos[videoId]!!.ty/*) is Float)*/
-//
-//        var fafaf = (watchedVideos[videoId] as Float?)?.toString()?.toFloat()
-//        Log.d(TAG, "getCurrentSecondForVideo: aaa fafaf is $fafaf")
-//
-//        return watchedVideos[videoId]
-////        return watchedVideos[videoId]?.roundToLong()?.toFloat()
+        return loadWatchedVideos()[videoId]
     }
 
 
