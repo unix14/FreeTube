@@ -2,25 +2,25 @@ package com.triPCups.media.freeTube.data
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.triPCups.media.freeTube.utils.TAG
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 @Suppress("UNCHECKED_CAST")
-object SharedPrefsManager {
-
-    private const val PREF_NAME = "app_preferences441"
-    private lateinit var sharedPreferences: SharedPreferences
+class SharedPrefsManager @Inject constructor(
+    @ApplicationContext context: Context
+) {
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
     private val gson = Gson()
 
-    fun initialize(context: Context) {
-        if (!::sharedPreferences.isInitialized) {
-            sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        }
+    companion object {
+        private const val PREF_NAME = "app_preferences441"
     }
 
-    // Generic function to save a value
     fun <T> saveValue(key: String, value: T) {
         val editor = sharedPreferences.edit()
         when (value) {
@@ -37,7 +37,6 @@ object SharedPrefsManager {
         editor.apply()
     }
 
-    // Generic function to load a value
     fun <T> loadValue(key: String, defaultValue: T): Any? {
         return when (defaultValue) {
             is String -> sharedPreferences.getString(key, defaultValue) as T
@@ -60,7 +59,6 @@ object SharedPrefsManager {
         }
     }
 
-    // Function to update a map in SharedPreferences with a new value for a specific key
     fun <K, V> updateMap(key: String, mapKey: K, mapValue: V) {
         @Suppress("UNCHECKED_CAST")
         val currentMap: MutableMap<K, V> =

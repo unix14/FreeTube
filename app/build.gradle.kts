@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -58,5 +60,9 @@ dependencies {
 
     // for shared prefs
     implementation("com.google.code.gson:gson:2.11.0")
+
+    // dependency injection
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
 }

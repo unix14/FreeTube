@@ -20,6 +20,7 @@ import androidx.activity.OnBackPressedCallback
 import com.triPCups.media.freeTube.consts.Constants
 import com.triPCups.media.freeTube.databinding.FragmentWebViewBinding
 import com.triPCups.media.freeTube.utils.WebAppInterface
+import dagger.hilt.android.AndroidEntryPoint
 
 
 interface WebViewFragmentListener {
@@ -27,6 +28,7 @@ interface WebViewFragmentListener {
     fun loadHome()
 }
 
+@AndroidEntryPoint
 class WebViewFragment : Fragment() {
 
     companion object {

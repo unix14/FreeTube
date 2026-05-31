@@ -18,7 +18,9 @@ import com.triPCups.media.freeTube.utils.YoutubeHelper
 import com.triPCups.media.freeTube.views.video.VideoFragment
 import com.triPCups.media.freeTube.views.webview.WebViewFragment
 import com.triPCups.media.freeTube.views.webview.WebViewFragmentListener
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), WebViewFragmentListener {
 
     private lateinit var binding: ActivityMainBinding
