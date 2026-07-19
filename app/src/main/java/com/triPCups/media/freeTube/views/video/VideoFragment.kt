@@ -18,9 +18,12 @@ import com.triPCups.media.freeTube.databinding.FragmentVideoBinding
 import com.triPCups.media.freeTube.utils.TAG
 import com.triPCups.media.freeTube.utils.WatchlistAgent
 import com.triPCups.media.freeTube.utils.urlToLoad
-import kotlin.jvm.functions.Function0
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
+
+@AndroidEntryPoint
 class VideoFragment : Fragment() {
 
     companion object {
@@ -31,6 +34,8 @@ class VideoFragment : Fragment() {
         }
     }
 
+
+    @Inject lateinit var watchlistAgent: WatchlistAgent
 
     private var didStartedToPlay: Boolean = false
 
@@ -139,7 +144,7 @@ class VideoFragment : Fragment() {
 
                         if(::videoPlayer.isInitialized && didStartedToPlay) {
                             Log.d(TAG, "onCurrentSecond: aaa  check41 $currentSecond ${currentSecond::class.java.simpleName}")
-                            WatchlistAgent.getInstance(requireContext()).updateWatchSecondInVideo(currentVideoId, currentSecond)
+                            watchlistAgent.updateWatchSecondInVideo(currentVideoId, currentSecond)
                         }
                     }
                 }
@@ -164,7 +169,7 @@ class VideoFragment : Fragment() {
         if (::videoPlayer.isInitialized) {
             currentVideoId = videoId
             currentSecond = try {
-                WatchlistAgent.getInstance(requireContext())
+                watchlistAgent
                     .getCurrentSecondForVideo(currentVideoId) ?: 0.0
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -183,10 +188,17 @@ class VideoFragment : Fragment() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        if (::videoPlayer.isInitialized && didStartedToPlay) {
+            watchlistAgent.updateWatchSecondInVideo(currentVideoId, currentSecond)
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
-        binding.youTubePlayerView.release()
         youTubePlayerListener?.let { binding.youTubePlayerView.removeYouTubePlayerListener(it) }
+        binding.youTubePlayerView.release()
         _binding = null
     }
 }

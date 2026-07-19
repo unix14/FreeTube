@@ -20,13 +20,15 @@ import androidx.activity.OnBackPressedCallback
 import com.triPCups.media.freeTube.consts.Constants
 import com.triPCups.media.freeTube.databinding.FragmentWebViewBinding
 import com.triPCups.media.freeTube.utils.WebAppInterface
+import dagger.hilt.android.AndroidEntryPoint
 
 
 interface WebViewFragmentListener {
-    fun onVideoClicked(videoId: String)
+    fun onVideoClicked(videoId: String, startSecond: Int = -1)
     fun loadHome()
 }
 
+@AndroidEntryPoint
 class WebViewFragment : Fragment() {
 
     companion object {
@@ -72,7 +74,8 @@ class WebViewFragment : Fragment() {
                 webView.settings.mediaPlaybackRequiresUserGesture = true // This may prevent autoplay
             }
             webView.webChromeClient = WebChromeClient()
-            webView.addJavascriptInterface(WebAppInterface(listener!!) {
+            val safeListener = listener ?: return
+            webView.addJavascriptInterface(WebAppInterface(safeListener) {
                 viewModel.clearWebpage()
             }, "AndroidInterface")
             webViewClient = object : WebViewClient() {
@@ -111,20 +114,12 @@ class WebViewFragment : Fragment() {
     private fun injectJavaScript() {
         val js = """
         document.addEventListener('click', function(event) {
-            // Intercept clicks on video thumbnails (usually <a> elements)
-            if (event.target.tagName === 'A' && event.target.href.includes('youtube.com/watch')) {
-                event.preventDefault();
-                AndroidInterface.onVideoClicked(event.target.href);
-            }
-            
-            // Intercept clicks on video titles (usually part of a <span> or <a> element inside a <div>)
-            // Adjust the selector as needed based on the page structure
             let target = event.target;
             while (target) {
                 if (target.tagName === 'A' && (target.href.includes('youtube.com/watch') || target.href.includes('youtu.be/'))) {
                     event.preventDefault();
                     AndroidInterface.onVideoClicked(target.href);
-                    break;
+                    return;
                 }
                 target = target.parentElement;
             }
@@ -164,8 +159,10 @@ class WebViewFragment : Fragment() {
         return binding.root
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding.webView.removeJavascriptInterface("AndroidInterface")
+        binding.webView.destroy()
         listener = null
     }
 }

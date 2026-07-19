@@ -18,7 +18,9 @@ import com.triPCups.media.freeTube.utils.YoutubeHelper
 import com.triPCups.media.freeTube.views.video.VideoFragment
 import com.triPCups.media.freeTube.views.webview.WebViewFragment
 import com.triPCups.media.freeTube.views.webview.WebViewFragmentListener
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), WebViewFragmentListener {
 
     private lateinit var binding: ActivityMainBinding
@@ -140,7 +142,7 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
                     // Perform action based on the URL, like loading a specific fragment or activity
                     if(url.contains("youtube.com") || url.contains("youtu.be")) {
                         sharedVideoUrl = url
-                        initUi()
+                        YoutubeHelper.extractVideoIdFromUrl(url)?.let { loadVideoFragment(it) }
                     } else {
                         loadWebViewFragment(url)
                     }
@@ -168,7 +170,7 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
         loadWebViewFragment(BASE_UTUBE_URL)
     }
 
-    override fun onVideoClicked(videoId: String) {
+    override fun onVideoClicked(videoId: String, startSecond: Int) {
         loadVideoFragment(videoId)
     }
 }
