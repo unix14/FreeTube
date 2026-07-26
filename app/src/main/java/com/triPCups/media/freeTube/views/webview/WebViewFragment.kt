@@ -50,7 +50,9 @@ class WebViewFragment : Fragment() {
     }
 
     private fun handleUrl(url: String?) = with(binding) {
-        if(!url.isNullOrEmpty()) {
+        if (url.isNullOrEmpty()) {
+            webView.stopLoading()
+        } else {
             webView.loadUrl(url)
         }
     }

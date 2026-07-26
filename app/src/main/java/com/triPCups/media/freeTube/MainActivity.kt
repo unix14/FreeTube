@@ -22,7 +22,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : AppCompatActivity(), WebViewFragmentListener {
 
     private lateinit var binding: ActivityMainBinding
-    private var sharedVideoUrl: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +60,6 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
                     if ("text/plain" == type) {
                         // Handle text being sent
                         getStringExtra(Intent.EXTRA_TEXT)?.let { url ->
-                            sharedVideoUrl = url
                             handledLink = true
                             YoutubeHelper.extractVideoIdFromUrl(url)?.let { videoId ->
                                 val second = YoutubeHelper.extractTimestampFromUrl(url) ?: -1
@@ -84,7 +82,6 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
                         handledLink = true
                         // Perform action based on the URL, like loading a specific fragment or activity
                         if(url.contains("youtube.com") || url.contains("youtu.be")) {
-                            sharedVideoUrl = url
                             YoutubeHelper.extractVideoIdFromUrl(url)?.let { videoId ->
                                 val second = YoutubeHelper.extractTimestampFromUrl(url) ?: -1
                                 loadVideoFragment(videoId, second)
@@ -122,6 +119,6 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
     }
 
     override fun onVideoClicked(videoId: String, startSecond: Int) {
-        loadVideoFragment(videoId)
+        loadVideoFragment(videoId, startSecond)
     }
 }

@@ -19,11 +19,13 @@ class WebAppInterface(private val listener: WebViewFragmentListener, private val
         Log.d("wow", "onVideoClicked: gone through $videoUrl")
 
         val videoId = YoutubeHelper.extractVideoIdFromUrl(videoUrl)
-        videoId?.let {
-            val second = YoutubeHelper.extractTimestampFromUrl(videoUrl) ?: -1
-            Log.d("wow", "onVideoClicked: second is $second")
-            listener.onVideoClicked(it, second)
-            onVideoClicked()
+        if (videoId == null) {
+            urlToLoad = "" // clear so the same URL can be retried later
+            return
         }
+        val second = YoutubeHelper.extractTimestampFromUrl(videoUrl) ?: -1
+        Log.d("wow", "onVideoClicked: second is $second")
+        listener.onVideoClicked(videoId, second)
+        onVideoClicked()
     }
 }
