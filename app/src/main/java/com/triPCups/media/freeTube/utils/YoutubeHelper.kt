@@ -5,10 +5,12 @@ class YoutubeHelper {
     companion object {
 
         fun extractVideoIdFromUrl(url: String): String? {
-            val regex = "(?:https?://)?(?:www\\.|m\\.)?(?:youtube\\.com/watch\\?v=|youtube\\.com/embed/|youtu\\.be/)([\\w-]{11})"
-            val pattern = Regex(regex)
-            val matchResult = pattern.find(url)
-            return matchResult?.groupValues?.getOrNull(1)
+            // Handle youtu.be short links and /embed/ and /shorts/
+            val shortRegex = Regex("(?:https?://)?(?:www\\.|m\\.)?(?:youtu\\.be/|youtube\\.com/(?:embed/|shorts/))([\\w-]{11})")
+            shortRegex.find(url)?.groupValues?.getOrNull(1)?.let { return it }
+            // Handle youtube.com/watch?... where v= may not be the first parameter
+            val watchRegex = Regex("[?&]v=([\\w-]{11})")
+            return watchRegex.find(url)?.groupValues?.getOrNull(1)
         }
 
         fun extractTimestampFromUrl(url: String): Int? {
