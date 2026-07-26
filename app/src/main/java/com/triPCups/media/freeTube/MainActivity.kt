@@ -1,11 +1,9 @@
 package com.triPCups.media.freeTube
 
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import android.view.OrientationEventListener
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -25,7 +23,6 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
 
     private lateinit var binding: ActivityMainBinding
     private var sharedVideoUrl: String? = null
-    private var orientationEventListener: OrientationEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,58 +36,8 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
             insets
         }
 
-        handleNewIntent()
+        handleNewIntent(isFirstCreate = true)
         initUi()
-
-        // Initialize the OrientationEventListener
-        orientationEventListener = object : OrientationEventListener(this) {
-            override fun onOrientationChanged(orientation: Int) {
-                if (orientation == ORIENTATION_UNKNOWN) {
-                    // The device is in an unknown orientation state
-                    return
-                }
-
-                // Determine the rotation angle (0, 90, 180, 270 degrees)
-                when (orientation) {
-                    in 45..134 -> {
-                        // Device is rotated to landscape (clockwise)
-                        Log.d("Orientation", "Landscape 90°")
-                        // Force landscape orientation
-                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
-                    }
-
-                    in 135..224 -> {
-                        // Device is rotated upside down
-                        Log.d("Orientation", "Upside Down 180°")
-                        // Force portrait orientation if you want to revert to portrait when upside down
-                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
-                    }
-
-                    in 225..314 -> {
-                        // Device is rotated to landscape (counterclockwise)
-                        Log.d("Orientation", "Landscape 270°")
-                        // Force landscape orientation
-                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    }
-
-                    else -> {
-                        // Device is in portrait
-                        Log.d("Orientation", "Portrait 0°")
-                        // Force portrait orientation
-                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    }
-                }
-            }
-        }
-        // Enable the OrientationEventListener
-        orientationEventListener?.enable()
-    }
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-        // Disable the OrientationEventListener when the activity is destroyed
-        orientationEventListener?.disable()
     }
 
     private fun initUi() {
@@ -98,61 +45,65 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
         val blackColor = Color.rgb(0, 0, 0)
         window.navigationBarColor = blackColor
         window.statusBarColor = blackColor
-
-        loadHome()
-
-        if(sharedVideoUrl?.isNotEmpty() == true) {
-            var url: String = sharedVideoUrl!!
-            val second = YoutubeHelper.extractTimestampFromUrl(url) ?: -1
-            Log.d("wow", "initUi: second is $second")
-
-            YoutubeHelper.extractVideoIdFromUrl(url)?.let {
-                loadVideoFragment(it)
-            }
-            //todo extract time to skip to point
-        }
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        handleNewIntent()
+        setIntent(intent)
+        handleNewIntent(isFirstCreate = false)
     }
-    private fun handleNewIntent() = with(intent) {
-        when {
-            action == Intent.ACTION_SEND -> {
-                if ("text/plain" == type) {
-                    // Handle text being sent
-                    getStringExtra(Intent.EXTRA_TEXT)?.let {
-                        // Update UI to reflect text being shared
-                        sharedVideoUrl = it
-                    }
-                } else {
-                    // print an error
-                    Log.e("wow", "handleShareText: Can't read intent.type is $type and action is $action")
-                }
-            }
-            else -> {
-                // Handle other intents, such as being started from the home screen
-                Log.e("wow", "handleShareText: couldn't recognise the intent.type is $type and action is $action")
 
-                // Handle intent from other apps starting a youtube video
-                data?.let {
-                    // Handle the URL here
-                    val url = data.toString()
-                    // Perform action based on the URL, like loading a specific fragment or activity
-                    if(url.contains("youtube.com") || url.contains("youtu.be")) {
-                        sharedVideoUrl = url
-                        YoutubeHelper.extractVideoIdFromUrl(url)?.let { loadVideoFragment(it) }
+    private fun handleNewIntent(isFirstCreate: Boolean = false) {
+        var handledLink = false
+        with(intent) {
+            when {
+                action == Intent.ACTION_SEND -> {
+                    if ("text/plain" == type) {
+                        // Handle text being sent
+                        getStringExtra(Intent.EXTRA_TEXT)?.let { url ->
+                            sharedVideoUrl = url
+                            handledLink = true
+                            YoutubeHelper.extractVideoIdFromUrl(url)?.let { videoId ->
+                                val second = YoutubeHelper.extractTimestampFromUrl(url) ?: -1
+                                loadVideoFragment(videoId, second)
+                            }
+                        }
                     } else {
-                        loadWebViewFragment(url)
+                        // print an error
+                        Log.e("wow", "handleShareText: Can't read intent.type is $type and action is $action")
+                    }
+                }
+                else -> {
+                    // Handle other intents, such as being started from the home screen
+                    Log.e("wow", "handleShareText: couldn't recognise the intent.type is $type and action is $action")
+
+                    // Handle intent from other apps starting a youtube video
+                    data?.let {
+                        // Handle the URL here
+                        val url = data.toString()
+                        handledLink = true
+                        // Perform action based on the URL, like loading a specific fragment or activity
+                        if(url.contains("youtube.com") || url.contains("youtu.be")) {
+                            sharedVideoUrl = url
+                            YoutubeHelper.extractVideoIdFromUrl(url)?.let { videoId ->
+                                val second = YoutubeHelper.extractTimestampFromUrl(url) ?: -1
+                                loadVideoFragment(videoId, second)
+                            }
+                        } else {
+                            loadWebViewFragment(url)
+                        }
                     }
                 }
             }
         }
+
+        if (isFirstCreate && !handledLink) {
+            loadHome()
+        }
     }
 
-    private fun loadVideoFragment(videoId: String) {
-        loadFragment(VideoFragment.newInstance(videoId))
+    private fun loadVideoFragment(videoId: String, startSecond: Int = -1) {
+        loadFragment(VideoFragment.newInstance(videoId, startSecond))
     }
 
     private fun loadWebViewFragment(url: String) {

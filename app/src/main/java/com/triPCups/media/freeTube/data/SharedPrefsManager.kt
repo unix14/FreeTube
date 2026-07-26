@@ -62,7 +62,7 @@ class SharedPrefsManager @Inject constructor(
     fun <K, V> updateMap(key: String, mapKey: K, mapValue: V) {
         @Suppress("UNCHECKED_CAST")
         val currentMap: MutableMap<K, V> =
-            (loadValue(key, emptyMap<K, V>()) as? MutableMap<K, V>) ?: mutableMapOf()
+            (loadValue(key, emptyMap<K, V>()) as? Map<K, V>)?.toMutableMap() ?: mutableMapOf()
         currentMap[mapKey] = mapValue
         saveValue(key, currentMap)
     }

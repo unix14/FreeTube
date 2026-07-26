@@ -63,19 +63,19 @@ class WebViewFragment : Fragment() {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private fun initUi() = with(binding){
-        webView.apply {
+    private fun initUi() {
+        binding.webView.apply {
             settings.apply {
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
                 useWideViewPort = true
                 mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                webView.settings.mediaPlaybackRequiresUserGesture = true // This may prevent autoplay
+                settings.mediaPlaybackRequiresUserGesture = true // This may prevent autoplay
             }
-            webView.webChromeClient = WebChromeClient()
+            webChromeClient = WebChromeClient()
             val safeListener = listener ?: return
-            webView.addJavascriptInterface(WebAppInterface(safeListener) {
+            addJavascriptInterface(WebAppInterface(safeListener) {
                 viewModel.clearWebpage()
             }, "AndroidInterface")
             webViewClient = object : WebViewClient() {
@@ -147,7 +147,6 @@ class WebViewFragment : Fragment() {
                 binding.webView.apply {
                     if(canGoBack()) {
                         Log.d("wow", "handleOnBackPressed: canGoBack")
-                        listener?.loadHome()
                         goBack()
                     } else {
                         Log.d("wow", "handleOnBackPressed: finish")

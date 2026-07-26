@@ -27,9 +27,10 @@ import javax.inject.Inject
 class VideoFragment : Fragment() {
 
     companion object {
-        fun newInstance(videoId: String) = VideoFragment().apply {
+        fun newInstance(videoId: String, startSecond: Int = -1) = VideoFragment().apply {
             arguments = Bundle().apply {
                 putString(Constants.VIDEO_FRAG_VIDEO_ID_PARAM, videoId)
+                putInt(Constants.VIDEO_FRAG_START_SECOND_PARAM, startSecond)
             }
         }
     }
@@ -38,6 +39,7 @@ class VideoFragment : Fragment() {
     @Inject lateinit var watchlistAgent: WatchlistAgent
 
     private var didStartedToPlay: Boolean = false
+    private var passedStartSecond: Int = -1
 
     //vm
     private val viewModel: VideoViewModel by viewModels()
@@ -92,6 +94,7 @@ class VideoFragment : Fragment() {
     ): View {
         _binding = FragmentVideoBinding.inflate(inflater, container, false)
         arguments?.apply {
+            passedStartSecond = getInt(Constants.VIDEO_FRAG_START_SECOND_PARAM, -1)
             getString(Constants.VIDEO_FRAG_VIDEO_ID_PARAM)?.let { videoId ->
                 viewModel.setCurrentVideo(videoId)
             }
@@ -168,13 +171,18 @@ class VideoFragment : Fragment() {
     private fun playVideo(videoId: String) = with(binding) {
         if (::videoPlayer.isInitialized) {
             currentVideoId = videoId
-            currentSecond = try {
-                watchlistAgent
-                    .getCurrentSecondForVideo(currentVideoId) ?: 0.0
-            } catch (e: Exception) {
-                e.printStackTrace()
-                -1.0
+            currentSecond = if (passedStartSecond >= 0) {
+                passedStartSecond.toDouble()
+            } else {
+                try {
+                    watchlistAgent
+                        .getCurrentSecondForVideo(currentVideoId) ?: 0.0
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    -1.0
+                }
             }
+            passedStartSecond = -1 // Reset after consuming
             Log.d(TAG, "playVideo: aaa currentSecond $currentSecond")
 
             videoPlayer.loadVideo(videoId, currentSecond.toFloat())
