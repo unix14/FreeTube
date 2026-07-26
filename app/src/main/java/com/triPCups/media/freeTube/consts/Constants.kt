@@ -3,6 +3,7 @@ package com.triPCups.media.freeTube.consts
 class Constants {
     companion object {
         const val VIDEO_FRAG_VIDEO_ID_PARAM = "videoId"
+        const val VIDEO_FRAG_START_SECOND_PARAM = "startSecond"
 
         const val WEB_VIEW_FRAG_URL_PARAM = "webviewUrl"
 
