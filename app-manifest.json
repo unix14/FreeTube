@@ -1,0 +1,11 @@
+{
+  "package_name": "com.triPCups.media.freeTube",
+  "title": "FreeTube",
+  "repository": "unix14/FreeTube",
+  "short_description": "Free lightweight ad-free YouTube player.",
+  "long_description": "A clean YouTube Android client with no ads, background play, orientation-aware fullscreen, and last-played-second resume.",
+  "supported_platforms": ["android_tv", "android_mobile"],
+  "latest_version": "1.0.0",
+  "apk_asset_name": "FreeTube-v1.0.0.apk",
+  "release_notes": "Initial appSync manifest for v1.0.0."
+}
