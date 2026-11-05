@@ -53,7 +53,11 @@ class WebViewFragment : Fragment() {
         if (url.isNullOrEmpty()) {
             webView.stopLoading()
         } else {
-            webView.loadUrl(url)
+            // Cleartext traffic is disabled app-wide; upgrade http:// links (accepted by the
+            // manifest intent filters) instead of failing with ERR_CLEARTEXT_NOT_PERMITTED.
+            webView.loadUrl(
+                if (url.startsWith("http://")) "https://" + url.removePrefix("http://") else url
+            )
         }
     }
 
@@ -72,7 +76,8 @@ class WebViewFragment : Fragment() {
                 domStorageEnabled = true
                 loadWithOverviewMode = true
                 useWideViewPort = true
-                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                // Never load http:// subresources into https:// pages (MITM-injectable content).
+                mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
                 settings.mediaPlaybackRequiresUserGesture = true // This may prevent autoplay
             }
             webChromeClient = WebChromeClient()
