@@ -18,20 +18,23 @@ class YoutubeHelper {
             val matchResult = regex.find(url)
             val tValue = matchResult?.groups?.get(2)?.value ?: return null
 
-            var totalSeconds = 0
+            // Long accumulator + toIntOrNull: values come from external links, so an oversized
+            // number must yield null instead of throwing NumberFormatException or overflowing.
+            var totalSeconds = 0L
             val timeRegex = Regex("(\\d+)([hms])")
             val matches = timeRegex.findAll(tValue)
 
             if (matches.any()) {
-                matches.forEach { m ->
-                    val amount = m.groupValues[1].toInt()
+                for (m in matches) {
+                    val amount = m.groupValues[1].toIntOrNull() ?: return null
                     when (m.groupValues[2]) {
-                        "h" -> totalSeconds += amount * 3600
-                        "m" -> totalSeconds += amount * 60
+                        "h" -> totalSeconds += amount * 3600L
+                        "m" -> totalSeconds += amount * 60L
                         "s" -> totalSeconds += amount
                     }
+                    if (totalSeconds > Int.MAX_VALUE) return null
                 }
-                return totalSeconds
+                return totalSeconds.toInt()
             } else {
                 // no time unit, parse as plain seconds
                 return tValue.toIntOrNull()
