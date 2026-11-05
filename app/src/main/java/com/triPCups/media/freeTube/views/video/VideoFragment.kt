@@ -146,6 +146,11 @@ class VideoFragment : Fragment() {
                         ) {
 
                         if(::videoPlayer.isInitialized && didStartedToPlay) {
+                            if (currentState == PlayerConstants.PlayerState.ENDED) {
+                                // Video finished: restart from the beginning next time rather than
+                                // resuming at the end (which ends playback immediately).
+                                currentSecond = 0.0
+                            }
                             Log.d(TAG, "onCurrentSecond: aaa  check41 $currentSecond ${currentSecond::class.java.simpleName}")
                             watchlistAgent.updateWatchSecondInVideo(currentVideoId, currentSecond)
                         }
