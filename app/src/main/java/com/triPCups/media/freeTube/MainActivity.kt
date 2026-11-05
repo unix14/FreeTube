@@ -35,7 +35,11 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
             insets
         }
 
-        handleNewIntent(isFirstCreate = true)
+        // On recreation (e.g. dark-mode/locale change or process death) the FragmentManager
+        // restores the back stack itself; re-handling the launch intent would push duplicates.
+        if (savedInstanceState == null) {
+            handleNewIntent(isFirstCreate = true)
+        }
         initUi()
     }
 
