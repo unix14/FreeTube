@@ -3,6 +3,7 @@ package com.triPCups.media.freeTube.data
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
+import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -37,7 +38,19 @@ class SharedPrefsManager @Inject constructor(
         editor.apply()
     }
 
-    fun <T> loadValue(key: String, defaultValue: T): Any? {
+    /**
+     * Returns the stored value, or [defaultValue] when the stored data is corrupt or was saved
+     * with a different type, so a bad entry can't crash every read/update of [key].
+     */
+    fun <T> loadValue(key: String, defaultValue: T): Any? = try {
+        loadValueOrThrow(key, defaultValue)
+    } catch (e: ClassCastException) {
+        defaultValue
+    } catch (e: JsonParseException) {
+        defaultValue
+    }
+
+    private fun <T> loadValueOrThrow(key: String, defaultValue: T): Any? {
         return when (defaultValue) {
             is String -> sharedPreferences.getString(key, defaultValue) as T
             is Int -> sharedPreferences.getInt(key, defaultValue) as T
