@@ -1,5 +1,7 @@
 package com.triPCups.media.freeTube.utils
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.webkit.JavascriptInterface
 import com.triPCups.media.freeTube.views.webview.WebViewFragmentListener
@@ -8,6 +10,9 @@ import com.triPCups.media.freeTube.views.webview.WebViewFragmentListener
 var urlToLoad = ""
 
 class WebAppInterface(private val listener: WebViewFragmentListener, private val onVideoClicked: () -> Unit ) {
+
+    // @JavascriptInterface methods run on the WebView's JavaBridge thread, not the UI thread.
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     @JavascriptInterface
     fun onVideoClicked(videoUrl: String) {
@@ -25,7 +30,10 @@ class WebAppInterface(private val listener: WebViewFragmentListener, private val
         }
         val second = YoutubeHelper.extractTimestampFromUrl(videoUrl) ?: -1
         Log.d("wow", "onVideoClicked: second is $second")
-        listener.onVideoClicked(videoId, second)
-        onVideoClicked()
+        // Fragment transactions must run on the main thread.
+        mainHandler.post {
+            listener.onVideoClicked(videoId, second)
+            onVideoClicked()
+        }
     }
 }
