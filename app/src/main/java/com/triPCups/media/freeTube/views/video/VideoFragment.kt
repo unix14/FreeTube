@@ -208,6 +208,9 @@ class VideoFragment : Fragment() {
         youTubePlayerListener?.let { binding.youTubePlayerView.removeYouTubePlayerListener(it) }
         binding.youTubePlayerView.release()
         _binding = null
+        // Leaving the video by any route (not only the back callback) must re-allow clicking the
+        // same video again in the web view, which WebAppInterface dedupes via urlToLoad.
+        urlToLoad = ""
     }
 }
 
