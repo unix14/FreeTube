@@ -39,7 +39,9 @@ class WebViewFragment : Fragment() {
         }
     }
 
-    private lateinit var binding: FragmentWebViewBinding
+    private var _binding: FragmentWebViewBinding? = null
+    // Only valid between onCreateView and onDestroyView.
+    private val binding get() = _binding!!
     private val viewModel: WebViewViewModel by viewModels()
     private var listener: WebViewFragmentListener? = null
 
@@ -127,14 +129,14 @@ class WebViewFragment : Fragment() {
             }
         }, true);
     """
-        binding.webView.evaluateJavascript(js, null)
+        _binding?.webView?.evaluateJavascript(js, null)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentWebViewBinding.inflate(inflater, container, false)
+        _binding = FragmentWebViewBinding.inflate(inflater, container, false)
         arguments?.apply {
             getString(Constants.WEB_VIEW_FRAG_URL_PARAM)?.let { url ->
                 viewModel.loadUrl(url)
@@ -162,8 +164,15 @@ class WebViewFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding.webView.removeJavascriptInterface("AndroidInterface")
-        binding.webView.destroy()
+        binding.webView.apply {
+            stopLoading()
+            removeJavascriptInterface("AndroidInterface")
+            // WebView.destroy() must only be called once the WebView is detached from the view tree.
+            (parent as? ViewGroup)?.removeView(this)
+            destroy()
+        }
         listener = null
+        // The fragment instance stays alive on the back stack; drop the destroyed view hierarchy.
+        _binding = null
     }
 }
