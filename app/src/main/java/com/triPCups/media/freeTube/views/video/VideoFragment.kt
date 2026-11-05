@@ -176,10 +176,11 @@ class VideoFragment : Fragment() {
             } else {
                 try {
                     watchlistAgent
-                        .getCurrentSecondForVideo(currentVideoId) ?: 0.0
+                        .getCurrentSecondForVideo(currentVideoId)?.coerceAtLeast(0.0) ?: 0.0
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    -1.0
+                    // Unreadable saved position: start from the beginning, never at a negative time.
+                    0.0
                 }
             }
             passedStartSecond = -1 // Reset after consuming
