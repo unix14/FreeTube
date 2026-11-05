@@ -60,8 +60,8 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
                     if ("text/plain" == type) {
                         // Handle text being sent
                         getStringExtra(Intent.EXTRA_TEXT)?.let { url ->
-                            handledLink = true
                             YoutubeHelper.extractVideoIdFromUrl(url)?.let { videoId ->
+                                handledLink = true
                                 val second = YoutubeHelper.extractTimestampFromUrl(url) ?: -1
                                 loadVideoFragment(videoId, second)
                             }
@@ -81,12 +81,17 @@ class MainActivity : AppCompatActivity(), WebViewFragmentListener {
                         val url = data.toString()
                         handledLink = true
                         // Perform action based on the URL, like loading a specific fragment or activity
-                        if(url.contains("youtube.com") || url.contains("youtu.be")) {
-                            YoutubeHelper.extractVideoIdFromUrl(url)?.let { videoId ->
-                                val second = YoutubeHelper.extractTimestampFromUrl(url) ?: -1
-                                loadVideoFragment(videoId, second)
-                            }
+                        val videoId = if (url.contains("youtube.com") || url.contains("youtu.be")) {
+                            YoutubeHelper.extractVideoIdFromUrl(url)
                         } else {
+                            null
+                        }
+                        if (videoId != null) {
+                            val second = YoutubeHelper.extractTimestampFromUrl(url) ?: -1
+                            loadVideoFragment(videoId, second)
+                        } else {
+                            // Not a video link (e.g. channel/playlist page): open it in the web view
+                            // instead of leaving an empty container.
                             loadWebViewFragment(url)
                         }
                     }
