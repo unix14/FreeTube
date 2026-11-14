@@ -102,7 +102,13 @@ class VideoFragment : Fragment() {
         // Handle back press to navigate to WebViewFragment
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                parentFragmentManager.popBackStack()
+                if (parentFragmentManager.backStackEntryCount > 1) {
+                    parentFragmentManager.popBackStack()
+                } else {
+                    // Opened directly from a shared/external link: this is the only entry, so
+                    // popping it would leave an empty container. Return to the caller instead.
+                    requireActivity().finish()
+                }
                 urlToLoad = ""
             }
         })
