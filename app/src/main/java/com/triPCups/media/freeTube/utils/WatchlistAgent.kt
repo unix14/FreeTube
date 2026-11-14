@@ -12,6 +12,9 @@ class WatchlistAgent @Inject constructor(
 ) {
     companion object {
         private const val KEY_WATCHED_VIDEOS = "watched_videos122"
+        // Only the most recently watched videos are kept, so the stored JSON (which is re-read
+        // and re-written on every pause) can't grow without bound.
+        private const val MAX_WATCHED_VIDEOS = 500
     }
 
     fun saveWatchedVideos(watchedVideos: Map<String, Double>) {
@@ -37,7 +40,15 @@ class WatchlistAgent @Inject constructor(
 
     fun updateWatchSecondInVideo(videoId: String, second: Double) {
         Log.d(TAG, "updateWatchSecondInVideo: videoId=$videoId second=$second")
-        prefs.updateMap<String, Double>(KEY_WATCHED_VIDEOS, videoId, second)
+        // toMutableMap() is a LinkedHashMap, so iteration order is oldest -> most recently updated.
+        val watchedVideos = loadWatchedVideos().toMutableMap()
+        watchedVideos.remove(videoId) // re-insert so this video becomes the most recent entry
+        watchedVideos[videoId] = second
+        val overflow = watchedVideos.size - MAX_WATCHED_VIDEOS
+        if (overflow > 0) {
+            watchedVideos.keys.take(overflow).forEach { watchedVideos.remove(it) }
+        }
+        saveWatchedVideos(watchedVideos)
     }
 
     fun getCurrentSecondForVideo(videoId: String): Double? {
